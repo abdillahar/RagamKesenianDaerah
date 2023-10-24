@@ -1,33 +1,48 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, TouchableWithoutFeedback, Modal, Alert, ImageBackground, TextInput, Button } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground, TextInput, FlatList } from 'react-native';
 import { Notification, SearchNormal, Receipt21, Clock, Message, ArrowRight2, } from 'iconsax-react-native';
 import { fontType, colors } from './src/assets/theme';
+import {  CategoryList } from './data';
+
+const ItemCategory = ({ item, onPress, color }) => {
+  return (
+    <TouchableOpacity onPress={onPress}>
+      <View style={category.item}>
+        <Text style={{ ...category.title, color }}>{item.categoryName}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const FlatListCategory = () => {
+  const [selected, setSelected] = useState(1);
+  const renderItem = ({ item }) => {
+    const color = item.id === selected ? colors.blue() : colors.grey();
+    return (
+      <ItemCategory
+        item={item}
+        onPress={() => setSelected(item.id)}
+        color={color}
+      />
+    );
+  };
+  return (
+    <FlatList
+      data={CategoryList}
+      keyExtractor={item => item.id}
+      renderItem={item => renderItem({ ...item })}
+      ItemSeparatorComponent={() => <View style={{ width: 10 }} />}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+    />
+  );
+};
 
 const HomeScreen = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
 
   const handleSearchPress = (text) => {
     setSearchText(text);
-  };
-
-  const toggleModal = () => {
-    setIsModalVisible(!isModalVisible);
-  };
-
-  const handleProfilePress = () => {
-    toggleModal();
-  };
-
-  const handleEditProfile = () => {
-    toggleModal();
-    // Tambahkan kode untuk tindakan edit profil di sini
-  };
-
-  const handleLogout = () => {
-    toggleModal();
-    // Tambahkan kode untuk tindakan logout di sini
   };
   return (
     <View style={styles.container}>
@@ -41,17 +56,13 @@ const HomeScreen = () => {
               <Notification color={colors.black()} variant="Linear" size={24} />
             </View>
             <View style={styles.profileContainer}>
-              <TouchableOpacity onPress={handleProfilePress}>
-                <Image
-                  source={{
-                    uri: 'https://templates.iqonic.design/sofbox-admin/sofbox-dashboard-html/html/images/user/1.jpg',
-                  }}
-                  style={styles.profileImage}
-                />
-              </TouchableOpacity>
+              <Image
+                source={{
+                  uri: 'https://templates.iqonic.design/sofbox-admin/sofbox-dashboard-html/html/images/user/1.jpg',
+                }}
+                style={styles.profileImage}
+              />
             </View>
-
-
           </View>
           <View style={styles.header}>
             <Text style={styles.title}>Selamat Datang, Abdillahar</Text>
@@ -71,37 +82,13 @@ const HomeScreen = () => {
                 </TouchableOpacity>
               </View>
             </View>
-
           </View>
         </View>
-        <KategoriSeniRupa/>
+        <KategoriSeniRupa />
         <SeniPopuler />
         <JelajahiBerdasarkanDaerah />
         <BeritaSeniRupa />
       </ScrollView>
-      <Modal
-        visible={isModalVisible}
-        animationType="none"
-        transparent={true}
-        onRequestClose={toggleModal}
-      >
-        <TouchableWithoutFeedback onPress={toggleModal}>
-          <View style={styles.overlay}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Profil Anda</Text>
-              <TouchableOpacity onPress={handleEditProfile}>
-                <Text style={styles.modalItem}>Edit Profil</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleLogout}>
-                <Text style={styles.modalItem}>Logout</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={toggleModal}>
-                <Text style={styles.modalItem}>Batal</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
     </View>
 
   );
@@ -283,6 +270,9 @@ const BeritaSeniRupa = () => {
       <View style={styles.seniPopulerTitleContainer}>
         <Text style={styles.textSeni}>Berita Tari</Text>
         <ArrowRight2 color={colors.black()} variant="Linear" size={20} />
+      </View>
+      <View style={{marginVertical: 10}}>
+        <FlatListCategory />
       </View>
       <View style={beritaSeniRupa.listCard}>
         <View style={beritaSeniRupa.cardItem}>
@@ -509,13 +499,19 @@ const itemSeniPopuler = StyleSheet.create({
   },
   cardTitle: {
     fontFamily: fontType['Pjs-Bold'],
-    fontSize: 14,
+    fontSize: 16,
     color: colors.white(),
+    textShadowColor: 'black', // Warna outline
+    textShadowOffset: { width: 1, height: 1 }, // Ukuran outline
+    textShadowRadius: 2, // Lebar outlin
   },
   cardText: {
     fontSize: 10,
     color: colors.white(),
     fontFamily: fontType['Pjs-Medium'],
+    textShadowColor: 'black', // Warna outline
+    textShadowOffset: { width: 1, height: 1 }, // Ukuran outline
+    textShadowRadius: 2, // Lebar outlin
   },
   cardIcon: {
     backgroundColor: colors.black(0.5),
@@ -712,7 +708,7 @@ const category = StyleSheet.create({
     marginHorizontal: 5
   },
   title: {
-    fontFamily: fontType['Pjs-SemiBold'] ,
+    fontFamily: fontType['Pjs-SemiBold'],
     fontSize: 14,
     lineHeight: 18,
     color: colors.grey(),
