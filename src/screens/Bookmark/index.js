@@ -11,64 +11,14 @@ const KoleksiPostingan = () => {
         <Text style={styles.textSeni}>Koleksi Postingan Kesenian</Text>
       </View>
 
-      <View style={{...styles.listBlog}}>
-        <View style={{ ...itemKoleksiPostingan.cardItem }}>
-          <ImageBackground
-            style={itemKoleksiPostingan.cardImage}
-            resizeMode="cover"
-            imageStyle={{ borderRadius: 15 }}
-            source={{
-              uri: 'https://i.pinimg.com/564x/85/b7/1d/85b71d74a0fab3ad93ab5e4b530c79ab.jpg',
-            }}
-          >
-            <View style={itemKoleksiPostingan.cardContent}>
-              <View style={itemKoleksiPostingan.textContainer}>
-                <Text style={itemKoleksiPostingan.cardTitle}>Kuda Lumping</Text>
-                <Text style={itemKoleksiPostingan.cardText}>Tarian Kuda Lumping ini menggunakan kuda yang terbuat dari bambu atau bahan lainnya yang di anyam dan dipotong menyerupai bentuk kuda, dengan dihiasi rambut tiruan dari tali plastik atau sejenisnya yang di gelung atau di kepang.</Text>
-              </View>
-
-            </View>
-          </ImageBackground>
-        </View>
-        <View style={itemKoleksiPostingan.cardItem}>
-          <ImageBackground
-            style={itemKoleksiPostingan.cardImage}
-            resizeMode="cover"
-            imageStyle={{ borderRadius: 15 }}
-            source={{
-              uri: 'https://i.pinimg.com/564x/29/30/c5/2930c534584f2147fe53b49758a95ecd.jpg',
-            }}
-          >
-            <View style={itemKoleksiPostingan.cardContent}>
-              <View style={itemKoleksiPostingan.textContainer}>
-                <Text style={itemKoleksiPostingan.cardTitle}>Reog ponorogo</Text>
-                <Text style={itemKoleksiPostingan.cardText}>Reog Ponorogo merupakan salah satu tradisi masyarakat Ponorogo yang yang masih hidup hingga saat ini. Pertunjukan ini bertujuan mempererat tali silaturahmi masyarakat Ponorogo.</Text>
-              </View>
-              {/* <View style={itemKoleksiPostingan.cardIcon}>
-                  <ArrowRight2 color={colors.white()} variant="Linear" size={20} />
-                </View> */}
-            </View>
-          </ImageBackground>
-        </View>
-        <View style={itemKoleksiPostingan.cardItem}>
-          <ImageBackground
-            style={itemKoleksiPostingan.cardImage}
-            resizeMode="cover"
-            imageStyle={{ borderRadius: 15 }}
-            source={{
-              uri: 'https://i.pinimg.com/564x/83/a2/e3/83a2e3f9edac49cdd2cdd48ac79c5c76.jpg',
-            }}
-          >
-            <View style={itemKoleksiPostingan.cardContent}>
-              <View style={itemKoleksiPostingan.textContainer}>
-                <Text style={itemKoleksiPostingan.cardTitle}>Tari Gandrung</Text>
-                <Text style={itemKoleksiPostingan.cardText}>Tari yang berasal dari Banyuwangi yang ditujukan atas ras syukur</Text>
-              </View>
-              {/* <View style={itemKoleksiPostingan.cardIcon}>
-                  <ArrowRight2 color={colors.white()} variant="Linear" size={20} />
-                </View> */}
-            </View>
-          </ImageBackground>
+      <View style={{ ...styles.listBlog }}>
+        <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}>
+          {BlogList.map((item, index) => (
+            <ItemBookmark item={item} key={index} />
+          ))}
         </View>
       </View>
     </View>
