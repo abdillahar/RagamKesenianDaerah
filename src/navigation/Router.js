@@ -12,7 +12,7 @@ function MainApp() {
     <Tab.Navigator
       screenOptions={{
         tabBarHideOnKeyboard: true,
-        tabBarActiveTintColor: colors.blue(),
+        tabBarActiveTintColor: 'rgba(119, 188, 255, 1)',
         tabBarInactiveTintColor: colors.black(),
         tabBarShowLabel: false,
         tabBarStyle: {

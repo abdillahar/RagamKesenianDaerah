@@ -1,10 +1,20 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
-import React, { useState } from 'react';
+import { Animated, StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, {useState, useRef} from 'react';
 import { ArrowLeft, Like1, Receipt21, Message, Share, More, BookSaved } from 'iconsax-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BlogList } from '../../../data';
 import { fontType, colors } from '../../assets/theme';
 const BookmarkDetail = ({ route }) => {
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const diffClampY = Animated.diffClamp(scrollY, 0, 52);
+  const headerY = diffClampY.interpolate({
+    inputRange: [0, 52],
+    outputRange: [0, -52],
+  });
+  const bottomBarY = diffClampY.interpolate({
+    inputRange: [0, 52],
+    outputRange: [0, 52],
+  });
   const { blogId } = route.params;
   const [iconStates, setIconStates] = useState({
     liked: { variant: 'Linear', color: colors.grey(0.6) },
@@ -26,7 +36,7 @@ const BookmarkDetail = ({ route }) => {
   };
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <Animated.View style={[styles.header, {transform:[{translateY:headerY}]}]}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft
             color={colors.black()}
@@ -40,9 +50,13 @@ const BookmarkDetail = ({ route }) => {
             variant="Linear"
           />
         </View>
-      </View>
-      <ScrollView
+      </Animated.View>
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: scrollY}}}],
+          {useNativeDriver: true},
+        )}
         contentContainerStyle={{
           paddingHorizontal: 24,
           paddingTop: 62,
@@ -67,8 +81,8 @@ const BookmarkDetail = ({ route }) => {
         </View>
         <Text style={styles.title}>{selectedBlog.title}</Text>
         <Text style={styles.content}>{selectedBlog.content}</Text>
-      </ScrollView>
-      <View style={styles.bottomBar}>
+      </Animated.ScrollView>
+      <Animated.View style={[styles.bottomBar, {transform:[{translateY:bottomBarY}]}]}>
         <Like1
           color={colors.black()}
           variant="Linear"
@@ -77,7 +91,7 @@ const BookmarkDetail = ({ route }) => {
           color={colors.black()}
           variant="Linear"
         />
-      </View>
+      </Animated.View>
     </View>
   );
 };
@@ -100,12 +114,12 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     left: 0,
-    backgroundColor: colors.white(),
+    backgroundColor: 'rgba(119, 188, 255, 0.3)',
   },
   bottomBar: {
     position: 'absolute',
     zIndex: 1000,
-    backgroundColor: colors.white(),
+    backgroundColor: 'rgba(119, 188, 255, 0.3)',
     paddingVertical: 14,
     paddingHorizontal: 60,
     bottom: 0,
