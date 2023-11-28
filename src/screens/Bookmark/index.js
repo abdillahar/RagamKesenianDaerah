@@ -1,9 +1,12 @@
-import { StyleSheet, Text, View, ScrollView, ImageBackground } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
 import React from 'react';
-import { Add } from 'iconsax-react-native';
+import { Add, Edit } from 'iconsax-react-native';
 import { BlogList } from '../../../data';
 import { ItemBookmark } from '../../components';
 import { fontType, colors } from '../../assets/theme';
+import { useNavigation } from "@react-navigation/native";
+
+const navigation = useNavigation();
 const KoleksiPostingan = () => {
   return (
     <View style={styles.headerKoleksiPostingan}>
@@ -90,6 +93,12 @@ const Bookmark = () => {
           <KoleksiPostingan />
         </View>
       </ScrollView>
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => navigation.navigate("AddKoleksi")}
+      >
+        <Edit color={colors.white()} variant="Linear" size={20} />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -123,6 +132,23 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flex: 1,
+  },
+  floatingButton: {
+    backgroundColor: 'rgba(119, 188, 255, 1)',
+    padding: 15,
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    borderRadius: 10,
+    shadowColor: 'rgba(119, 188, 255, 1)',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+
+    elevation: 8,
   },
   title: {
     fontSize: 20,

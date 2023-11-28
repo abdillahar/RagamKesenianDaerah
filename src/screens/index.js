@@ -3,4 +3,5 @@ import Discover from "./Discover";
 import Bookmark from "./Bookmark";
 import Profile from "./Profile";
 import BookmarkDetail from "./BookmarkDetail";
-export {Home, Discover, Bookmark, Profile, BookmarkDetail}
+import AddKoleksiForm from "./AddKoleksiForm";
+export {Home, Discover, Bookmark, Profile, BookmarkDetail, AddKoleksiForm}
