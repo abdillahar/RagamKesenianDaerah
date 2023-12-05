@@ -1,32 +1,13 @@
-import { StyleSheet, Text, View, ScrollView, ImageBackground, TouchableOpacity } from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, ScrollView, ImageBackground, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import React, { useState, useCallback } from 'react';
 import { Add, Edit } from 'iconsax-react-native';
 import { BlogList } from '../../../data';
 import { ItemBookmark } from '../../components';
 import { fontType, colors } from '../../assets/theme';
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import axios from 'axios';
 
-const navigation = useNavigation();
-const KoleksiPostingan = () => {
-  return (
-    <View style={styles.headerKoleksiPostingan}>
-      <View style={styles.KoleksiPostinganTitleContainer}>
-        <Text style={styles.textSeni}>Koleksi Postingan Kesenian</Text>
-      </View>
 
-      <View style={{ ...styles.listBlog }}>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}>
-          {BlogList.map((item, index) => (
-            <ItemBookmark item={item} key={index} />
-          ))}
-        </View>
-      </View>
-    </View>
-  );
-};
 
 const KoleksiVideo = () => {
   return (
@@ -82,15 +63,65 @@ const KoleksiVideo = () => {
   );
 };
 const Bookmark = () => {
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [blogData, setBlogData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const getDataBlog = async () => {
+    try {
+      const response = await axios.get(
+        'https://656ed25e6529ec1c6236b514.mockapi.io/rakder/koleksi',
+      );
+      setBlogData(response.data);
+      setLoading(false)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getDataBlog()
+      setRefreshing(false);
+    }, 1500);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getDataBlog();
+    }, [])
+  );
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Koleksi Saya</Text>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
         <View style={{ paddingHorizontal: 24, gap: 10, paddingVertical: 10 }}>
           <KoleksiVideo />
-          <KoleksiPostingan />
+          <View style={styles.headerKoleksiPostingan}>
+            <View style={styles.KoleksiPostinganTitleContainer}>
+              <Text style={styles.textSeni}>Koleksi Postingan Kesenian</Text>
+            </View>
+
+            <View style={{ ...styles.listBlog }}>
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+                {loading ? (
+                  <ActivityIndicator size={'large'} color={colors.blue()} />
+                ) : (
+                  blogData.map((item, index) => (
+                    <ItemBookmark item={item} key={index} />
+                  ))
+                )}
+              </View>
+            </View>
+          </View>
         </View>
       </ScrollView>
       <TouchableOpacity

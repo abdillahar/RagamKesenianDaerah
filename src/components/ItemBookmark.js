@@ -15,20 +15,20 @@ const truncateTextByWords = (text, maxWords) => {
 
 const ItemBookmark = ({ item }) => {
   return (
-    <TouchableOpacity onPress={() => navigation.navigate('BookmarkDetail', {blogId: item.id})}>
+    <TouchableOpacity onPress={() => navigation.navigate('BookmarkDetail', {blogId: item?.id})}>
       <ImageBackground
         style={itemKoleksiPostingan.cardImage}
         resizeMode="cover"
         imageStyle={{ borderRadius: 15 }}
         source={{
-          uri: item.image,
+          uri: item?.image,
         }}
       >
         <View style={itemKoleksiPostingan.cardContent}>
           <View style={itemKoleksiPostingan.textContainer}>
-            <Text style={itemKoleksiPostingan.cardTitle}>{item.title}</Text>
+            <Text style={itemKoleksiPostingan.cardTitle}>{item?.title}</Text>
             <Text style={itemKoleksiPostingan.cardText}>
-              {truncateTextByWords(item.content, 10)}
+              {truncateTextByWords(item?.content, 10)}
             </Text>
           </View>
         </View>

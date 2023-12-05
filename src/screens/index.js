@@ -4,4 +4,5 @@ import Bookmark from "./Bookmark";
 import Profile from "./Profile";
 import BookmarkDetail from "./BookmarkDetail";
 import AddKoleksiForm from "./AddKoleksiForm";
-export {Home, Discover, Bookmark, Profile, BookmarkDetail, AddKoleksiForm}
+import EditKoleksiForm from "./EditKoleksiForm";
+export {Home, Discover, Bookmark, Profile, BookmarkDetail, AddKoleksiForm, EditKoleksiForm}
