@@ -7,6 +7,9 @@ import { fontType, colors } from '../../assets/theme';
 import axios from 'axios';
 import ActionSheet from 'react-native-actions-sheet';
 import { formatDate } from '../../utils/formatDate';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
+
 const BookmarkDetail = ({ route }) => {
   const scrollY = useRef(new Animated.Value(0)).current;
   const diffClampY = Animated.diffClamp(scrollY, 0, 52);
@@ -36,36 +39,75 @@ const BookmarkDetail = ({ route }) => {
     actionSheetRef.current?.hide();
   };
 
-  useEffect(() => {
-    getBlogById();
-  }, [blogId]);
+  // useEffect(() => {
+  //   getBlogById();
+  // }, [blogId]);
 
-  const getBlogById = async () => {
-    try {
-      const response = await axios.get(
-        `https://656ed25e6529ec1c6236b514.mockapi.io/rakder/koleksi/${blogId}`,
-      );
-      setSelectedBlog(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const getBlogById = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://656ed25e6529ec1c6236b514.mockapi.io/rakder/koleksi/${blogId}`,
+  //     );
+  //     setSelectedBlog(response.data);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('blog')
+      .doc(blogId)
+      .onSnapshot(documentSnapshot => {
+        const blogData = documentSnapshot.data();
+        if (blogData) {
+          console.log('Blog data: ', blogData);
+          setSelectedBlog(blogData);
+        } else {
+          console.log(`Blog with ID ${blogId} not found.`);
+        }
+      });
+    setLoading(false);
+    return () => subscriber();
+  }, [blogId]);
 
   const navigateEdit = () => {
     closeActionSheet()
     navigation.navigate('EditKoleksi', { blogId })
   }
+  // const handleDelete = async () => {
+  //   await axios.delete(`https://656ed25e6529ec1c6236b514.mockapi.io/rakder/koleksi/${blogId}`)
+  //     .then(() => {
+  //       closeActionSheet()
+  //       navigation.navigate('Bookmark');
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // }
   const handleDelete = async () => {
-    await axios.delete(`https://656ed25e6529ec1c6236b514.mockapi.io/rakder/koleksi/${blogId}`)
-      .then(() => {
-        closeActionSheet()
-        navigation.navigate('Bookmark');
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
+    setLoading(true);
+    try {
+      await firestore()
+        .collection('blog')
+        .doc(blogId)
+        .delete()
+        .then(() => {
+          console.log('Blog deleted!');
+        });
+      if (selectedBlog?.image) {
+        const imageRef = storage().refFromURL(selectedBlog?.image);
+        await imageRef.delete();
+      }
+      console.log('Blog deleted!');
+      closeActionSheet();
+      setSelectedBlog(null);
+      setLoading(false)
+      navigation.navigate('Bookmark');
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const navigation = useNavigation();
   const toggleIcon = iconName => {
     setIconStates(prevStates => ({

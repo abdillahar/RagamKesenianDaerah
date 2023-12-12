@@ -1,13 +1,12 @@
 import { StyleSheet, Text, View, ScrollView, ImageBackground, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Add, Edit } from 'iconsax-react-native';
 import { BlogList } from '../../../data';
 import { ItemBookmark } from '../../components';
 import { fontType, colors } from '../../assets/theme';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import axios from 'axios';
-
-
+import firestore from '@react-native-firebase/firestore';
 
 const KoleksiVideo = () => {
   return (
@@ -67,31 +66,66 @@ const Bookmark = () => {
   const [loading, setLoading] = useState(true);
   const [blogData, setBlogData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const getDataBlog = async () => {
-    try {
-      const response = await axios.get(
-        'https://656ed25e6529ec1c6236b514.mockapi.io/rakder/koleksi',
-      );
-      setBlogData(response.data);
-      setLoading(false)
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const getDataBlog = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       'https://656ed25e6529ec1c6236b514.mockapi.io/rakder/koleksi',
+  //     );
+  //     setBlogData(response.data);
+  //     setLoading(false)
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  // const onRefresh = useCallback(() => {
+  //   setRefreshing(true);
+  //   setTimeout(() => {
+  //     getDataBlog()
+  //     setRefreshing(false);
+  //   }, 1500);
+  // }, []);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getDataBlog();
+  //   }, [])
+  // );
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('blog')
+      .onSnapshot(querySnapshot => {
+        const blogs = [];
+        querySnapshot.forEach(documentSnapshot => {
+          blogs.push({
+            ...documentSnapshot.data(),
+            id: documentSnapshot.id,
+          });
+        });
+        setBlogData(blogs);
+        setLoading(false);
+      });
+    return () => subscriber();
+  }, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      getDataBlog()
+      firestore()
+        .collection('blog')
+        .onSnapshot(querySnapshot => {
+          const blogs = [];
+          querySnapshot.forEach(documentSnapshot => {
+            blogs.push({
+              ...documentSnapshot.data(),
+              id: documentSnapshot.id,
+            });
+          });
+          setBlogData(blogs);
+        });
       setRefreshing(false);
     }, 1500);
   }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      getDataBlog();
-    }, [])
-  );
   return (
     <View style={styles.container}>
       <View style={styles.header}>

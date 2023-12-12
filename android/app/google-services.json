@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "419496193382",
+    "project_id": "rakder-ed5d8",
+    "storage_bucket": "rakder-ed5d8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:419496193382:android:e5d65215975c3b738aeca7",
+        "android_client_info": {
+          "package_name": "com.rakder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-LjQ4M9qc3jWrOnmkxiCRyBJQxExiP3A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
