@@ -1,17 +1,92 @@
 import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import { Heart, Logout, LogoutCurve, Setting, Setting2, UserEdit } from 'iconsax-react-native';
-import React from 'react';
+import React, { useEffect, useContext, useRef, useCallback } from 'react';
 
 import { ProfileData, BlogList } from '../../../data';
 import { ItemSmall } from '../../components';
 import { fontType, colors } from '../../assets/theme';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ActionSheet from 'react-native-actions-sheet';
+import { useNavigation } from '@react-navigation/native';
 
 const data = BlogList.slice(5);
 const Profile = () => {
+  const navigation = useNavigation();
+  const [profileData, setProfileData] = useState(null);
+  const actionSheetRef = useRef(null);
+  const openActionSheet = () => {
+    actionSheetRef.current?.show();
+  };
+  const closeActionSheet = () => {
+    actionSheetRef.current?.hide();
+  };
+  useEffect(() => {
+    const user = auth().currentUser;
+    const fetchBlogData = () => {
+      try {
+        if (user) {
+          const userId = user.uid;
+          const blogCollection = firestore().collection('blog');
+          const query = blogCollection.where('authorId', '==', userId);
+          const unsubscribeBlog = query.onSnapshot(querySnapshot => {
+            const blogs = querySnapshot.docs.map(doc => ({
+              ...doc.data(),
+              id: doc.id,
+            }));
+            setLoading(false);
+          });
+
+          return () => {
+            unsubscribeBlog();
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching blog data:', error);
+      }
+    };
+
+    const fetchProfileData = () => {
+      try {
+        const user = auth().currentUser;
+        if (user) {
+          const userId = user.uid;
+          const userRef = firestore().collection('users').doc(userId);
+
+          const unsubscribeProfile = userRef.onSnapshot(doc => {
+            if (doc.exists) {
+              const userData = doc.data();
+              setProfileData(userData);
+            } else {
+              console.error('Dokumen pengguna tidak ditemukan.');
+            }
+          });
+
+          return () => {
+            unsubscribeProfile();
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+      }
+    };
+    fetchProfileData();
+  }, []);
+  const handleLogout = async () => {
+    try {
+      closeActionSheet();
+      await auth().signOut();
+      await AsyncStorage.removeItem('userData');
+      navigation.replace('Login');
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={{ flex: 1,}}>
+        <View style={{ flex: 1, }}>
           <Text style={styles.title}>Rakder</Text>
         </View>
       </View>
@@ -27,26 +102,26 @@ const Profile = () => {
             <Image
               style={{ ...profile.pic, marginRight: 20 }}
               source={{
-                uri: ProfileData.profilePict,
+                uri: profileData?.photoUrl,
               }}
               resizeMode={'cover'}
             />
             <View style={{ alignItems: 'center' }}>
-              <Text style={profile.name}>{ProfileData.name}</Text>
+              <Text style={profile.name}>{profileData?.fullName}</Text>
               <View style={{ flexDirection: 'row', gap: 40, borderRadius: 25, backgroundColor: 'lightgrey', padding: 10 }}>
                 <View style={{ alignItems: 'center', gap: 5 }}>
-                  <Text style={profile.sum}>29</Text>
+                  <Text style={profile.sum}>{profileData?.totalPost}</Text>
                   <Text style={profile.tag}>Posted</Text>
                 </View>
                 <View style={{ alignItems: 'center', gap: 5 }}>
                   <Text style={profile.sum}>
-                    1000
+                    {profileData?.folowingCount}
                   </Text>
                   <Text style={profile.tag}>Following</Text>
                 </View>
                 <View style={{ alignItems: 'center', gap: 5 }}>
                   <Text style={profile.sum}>
-                    10
+                    {profileData?.followersCount}
                   </Text>
                   <Text style={profile.tag}>Follower</Text>
                 </View>
@@ -84,7 +159,7 @@ const Profile = () => {
               <Text style={{ color: 'black', marginLeft: 10, fontSize: 20 }} >Koleksi</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={openActionSheet}>
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'lightgrey', padding: 10, borderRadius: 15 }}>
               <LogoutCurve color={colors.black()} variant="Linear" size={24} />
               <Text style={{ color: 'black', marginLeft: 10, fontSize: 20 }} >Logout</Text>
@@ -92,6 +167,50 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <ActionSheet
+        ref={actionSheetRef}
+        containerStyle={{
+          borderTopLeftRadius: 25,
+          borderTopRightRadius: 25,
+        }}
+        indicatorStyle={{
+          width: 100,
+        }}
+        gestureEnabled={true}
+        defaultOverlayOpacity={0.3}>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 15,
+          }}
+          onPress={handleLogout}>
+          <Text
+            style={{
+              fontFamily: fontType['Pjs-Medium'],
+              color: colors.black(),
+              fontSize: 18,
+            }}>
+            Log out
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 15,
+          }}
+          onPress={closeActionSheet}>
+          <Text
+            style={{
+              fontFamily: fontType['Pjs-Medium'],
+              color: 'red',
+              fontSize: 18,
+            }}>
+            Cancel
+          </Text>
+        </TouchableOpacity>
+      </ActionSheet>
     </View>
   );
 };

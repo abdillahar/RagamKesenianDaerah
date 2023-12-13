@@ -5,4 +5,7 @@ import Profile from "./Profile";
 import BookmarkDetail from "./BookmarkDetail";
 import AddKoleksiForm from "./AddKoleksiForm";
 import EditKoleksiForm from "./EditKoleksiForm";
-export {Home, Discover, Bookmark, Profile, BookmarkDetail, AddKoleksiForm, EditKoleksiForm}
+import Login from "./Login";
+import Register from "./Register";
+import SplashScreen from "./SplashScreen";
+export {Home, Discover, Bookmark, Profile, BookmarkDetail, AddKoleksiForm, EditKoleksiForm, Login, Register, SplashScreen}
